@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -46,23 +47,45 @@ export default function Home() {
         </motion.a>
       </section>
 
-      {/* PORTFOLIO DEMOS */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      {/* PORTFOLIO */}
+      <section className="py-28 px-6 max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-16">
           Recent Design Concepts
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {["Real Estate Agency", "Luxury Cafe", "Fitness Studio"].map((item, i) => (
+        <div className="grid md:grid-cols-3 gap-10">
+          {[
+            { title: "Real Estate Agency", img: "/realestate.png" },
+            { title: "Luxury Cafe", img: "/cafe.png" },
+            { title: "Fitness Studio", img: "/fitness.png" },
+          ].map((item, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -10 }}
-              className="bg-gradient-to-b from-white/5 to-white/10 border border-white/10 rounded-2xl p-8 shadow-xl"
+              className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl"
             >
-              <div className="h-48 bg-gradient-to-r from-cyan-400/30 to-purple-500/30 rounded-xl mb-6"></div>
-              <h3 className="text-xl font-bold mb-3">{item}</h3>
+              {/* Browser Frame */}
+              <div className="bg-[#111827] rounded-xl p-3 mb-6 border border-white/10">
+                <div className="flex gap-2 mb-3">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+
+                <div className="overflow-hidden rounded-lg">
+                  <Image
+                    src={item.img}
+                    alt={item.title}
+                    width={900}
+                    height={600}
+                    className="rounded-lg hover:scale-105 transition duration-700 ease-in-out"
+                  />
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold mb-2">{item.title}</h3>
               <p className="text-gray-300 text-sm">
-                Modern, conversion-focused layout built for credibility and lead generation.
+                Modern, high-converting layout built for authority and lead generation.
               </p>
             </motion.div>
           ))}
@@ -70,7 +93,7 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section className="py-24 px-6 bg-gradient-to-r from-cyan-600/10 to-purple-600/10">
+      <section className="py-28 px-6 bg-gradient-to-r from-cyan-600/10 to-purple-600/10">
         <h2 className="text-4xl font-bold text-center mb-16">
           Website Packages
         </h2>
@@ -78,15 +101,15 @@ export default function Home() {
         <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto">
 
           {/* Starter Lite */}
-          <motion.div whileHover={{ y: -10 }} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-xl">
+          <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
             <h3 className="text-xl font-bold mb-3 text-cyan-400">Starter Lite</h3>
             <p className="text-3xl font-bold mb-6">₹2,500</p>
             <ul className="space-y-3 text-gray-300 mb-6">
               <li>✔ 1–3 Pages</li>
-              <li>✔ Free Hosting (Vercel)</li>
+              <li>✔ Free Hosting</li>
               <li>✔ Mobile Responsive</li>
               <li>✔ WhatsApp Integration</li>
-              <li>✔ Domain Cost Separate</li>
+              <li>✔ Domain Separate</li>
             </ul>
             <a
               href="https://wa.me/918793458846?text=Interested%20in%20Starter%20Lite%20Plan."
@@ -97,14 +120,14 @@ export default function Home() {
           </motion.div>
 
           {/* Basic */}
-          <motion.div whileHover={{ y: -10 }} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-xl">
+          <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
             <h3 className="text-xl font-bold mb-3 text-cyan-400">Basic</h3>
             <p className="text-3xl font-bold mb-6">₹3,999</p>
             <ul className="space-y-3 text-gray-300 mb-6">
               <li>✔ 4–5 Pages</li>
               <li>✔ Contact Form</li>
               <li>✔ WhatsApp Integration</li>
-              <li>✔ Basic SEO Setup</li>
+              <li>✔ Basic SEO</li>
               <li>✔ Mobile Optimized</li>
             </ul>
             <a
@@ -135,7 +158,7 @@ export default function Home() {
           </motion.div>
 
           {/* Custom */}
-          <motion.div whileHover={{ y: -10 }} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-xl">
+          <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-2xl p-8 shadow-xl">
             <h3 className="text-xl font-bold mb-3 text-cyan-400">Custom</h3>
             <p className="text-3xl font-bold mb-6">Custom Pricing</p>
             <ul className="space-y-3 text-gray-300 mb-6">
@@ -156,7 +179,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="py-12 text-center text-gray-400 text-sm border-t border-white/10">
         © {new Date().getFullYear()} ScaleVia Studio. All rights reserved.
       </footer>
@@ -164,4 +186,5 @@ export default function Home() {
     </main>
   );
 }
+
 
