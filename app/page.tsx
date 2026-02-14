@@ -1,101 +1,119 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="bg-white text-gray-900">
+      {/* HERO */}
+      <section className="py-20 px-6 text-center bg-gray-50">
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
+          Professional Websites That Help Your Business Grow
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          We build fast, mobile-optimized websites that turn visitors into customers.
+        </p>
+        <a
+          href="https://wa.me/918793458846?text=Hi%20I%20am%20interested%20in%20getting%20a%20website%20for%20my%20business."
+          className="bg-black text-white px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transition"
+        >
+          Get Free Consultation
+        </a>
+      </section>
 
-        {/* HERO SECTION */}
-        <section className="text-center mb-20">
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-            Still Watching AI Videos <br /> While Others Are Building Projects?
-          </h1>
-          <p className="text-xl text-gray-300 mb-8">
-            You don’t need another course. You need a roadmap that forces you
-            to build something real in 30 days.
-          </p>
-          <a
-            href="YOUR_RAZORPAY_LINK_HERE"
-            className="bg-white text-black px-8 py-4 rounded-2xl text-lg font-semibold hover:opacity-90 transition"
-          >
-            Get The Roadmap for ₹199
-          </a>
-          <p className="text-sm text-gray-400 mt-4">
-            Instant PDF Access. No Videos. No Fluff.
-          </p>
-        </section>
+      {/* SERVICES */}
+      <section className="py-20 px-6 max-w-6xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Website Packages
+        </h2>
 
-        {/* PAIN SECTION */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-semibold mb-6">
-            The Truth?
-          </h2>
-          <ul className="space-y-3 text-gray-300 text-lg">
-            <li>• Saving AI reels</li>
-            <li>• Watching 2-hour tutorials</li>
-            <li>• Comparing expensive courses</li>
-            <li>• Waiting to “feel ready”</li>
-          </ul>
-          <p className="mt-6 text-lg">
-            Someone else is building projects and adding them to their resume.
-          </p>
-          <p className="mt-4 text-xl font-semibold">
-            AI isn’t slowing you down. Confusion is.
-          </p>
-        </section>
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Starter */}
+          <div className="border rounded-xl p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-4">Starter</h3>
+            <p className="text-3xl font-bold mb-6">₹4,999</p>
+            <ul className="space-y-3 text-gray-600 mb-6">
+              <li>✔ 4–5 Pages Website</li>
+              <li>✔ Mobile Responsive</li>
+              <li>✔ WhatsApp Integration</li>
+              <li>✔ Contact Form</li>
+              <li>✔ Basic SEO Setup</li>
+            </ul>
+            <a
+              href="https://wa.me/918793458846?text=Hi%20I%20am%20interested%20in%20the%20Starter%20Website%20Package."
+              className="block text-center bg-black text-white py-3 rounded-lg font-semibold hover:opacity-90"
+            >
+              Choose Starter
+            </a>
+          </div>
 
-        {/* COURSE CONTRAST */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-semibold mb-6">
-            The ₹50,000+ Course Trap
-          </h2>
-          <p className="text-gray-300 mb-4">
-            AI courses today cost anywhere between ₹50,000 – ₹1,50,000.
-          </p>
-          <p className="text-gray-300 mb-4">
-            They promise transformation. But they don’t guarantee execution.
-          </p>
-          <p className="text-lg font-semibold">
-            This roadmap flips the order. You build first.
-          </p>
-        </section>
+          {/* Business */}
+          <div className="border-2 border-black rounded-xl p-8 shadow-md">
+            <h3 className="text-xl font-bold mb-4">Business</h3>
+            <p className="text-3xl font-bold mb-6">₹7,999</p>
+            <ul className="space-y-3 text-gray-600 mb-6">
+              <li>✔ Everything in Starter</li>
+              <li>✔ Domain + Hosting Setup</li>
+              <li>✔ Google Indexing</li>
+              <li>✔ Lead Form Optimization</li>
+              <li>✔ 1 Month Support</li>
+            </ul>
+            <a
+              href="https://wa.me/918793458846?text=Hi%20I%20am%20interested%20in%20the%20Business%20Website%20Package."
+              className="block text-center bg-black text-white py-3 rounded-lg font-semibold hover:opacity-90"
+            >
+              Choose Business
+            </a>
+          </div>
 
-        {/* WHAT YOU BUILD */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-semibold mb-6">
-            What You’ll Build in 30 Days
-          </h2>
-          <ul className="space-y-3 text-gray-300 text-lg">
-            <li>✔ A real AI Productivity Workflow System</li>
-            <li>✔ A resume-ready project</li>
-            <li>✔ A clear interview explanation</li>
-            <li>✔ Practical AI confidence</li>
-          </ul>
-          <p className="mt-6 text-gray-400">
-            No coding required. No paid tools required.
-          </p>
-        </section>
+          {/* Growth */}
+          <div className="border rounded-xl p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-4">Growth</h3>
+            <p className="text-3xl font-bold mb-6">₹12,999</p>
+            <ul className="space-y-3 text-gray-600 mb-6">
+              <li>✔ Custom Design</li>
+              <li>✔ Advanced SEO Structure</li>
+              <li>✔ Conversion Optimization</li>
+              <li>✔ Speed Optimization</li>
+              <li>✔ 2 Months Support</li>
+            </ul>
+            <a
+              href="https://wa.me/918793458846?text=Hi%20I%20am%20interested%20in%20the%20Growth%20Website%20Package."
+              className="block text-center bg-black text-white py-3 rounded-lg font-semibold hover:opacity-90"
+            >
+              Choose Growth
+            </a>
+          </div>
+        </div>
+      </section>
 
-        {/* PRICE SECTION */}
-        <section className="text-center mb-20">
-          <p className="text-gray-400 line-through text-lg">
-            AI Courses: ₹50,000 – ₹1,50,000
-          </p>
-          <h2 className="text-5xl font-bold mt-4 mb-6">
-            ₹199 Only
-          </h2>
-          <a
-            href="YOUR_RAZORPAY_LINK_HERE"
-            className="bg-white text-black px-8 py-4 rounded-2xl text-lg font-semibold hover:opacity-90 transition"
-          >
-            Get The 30-Day AI Roadmap
-          </a>
-        </section>
+      {/* WHY US */}
+      <section className="py-20 px-6 bg-gray-50 text-center">
+        <h2 className="text-3xl font-bold mb-6">Why Choose Scale Via Us?</h2>
+        <p className="text-gray-600 max-w-3xl mx-auto mb-8">
+          We focus on building websites that are fast, mobile-friendly,
+          and designed to generate real business leads — not just look good.
+        </p>
+        <div className="flex flex-wrap justify-center gap-8 text-gray-700">
+          <div>⚡ Fast Delivery</div>
+          <div>📱 Mobile Optimized</div>
+          <div>🔍 SEO Ready</div>
+          <div>💬 Direct WhatsApp Support</div>
+        </div>
+      </section>
 
-        {/* FOOTER */}
-        <footer className="text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} Stop Watching. Start Building.
-        </footer>
+      {/* FINAL CTA */}
+      <section className="py-20 px-6 text-center">
+        <h2 className="text-4xl font-bold mb-6">
+          Ready to Build Your Business Website?
+        </h2>
+        <a
+          href="https://wa.me/918793458846?text=Hi%20I%20want%20to%20build%20a%20website%20for%20my%20business."
+          className="bg-black text-white px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90"
+        >
+          Chat on WhatsApp Now
+        </a>
+      </section>
 
-      </div>
+      <footer className="py-8 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} Scale Via Us. All rights reserved.
+      </footer>
     </main>
   );
 }
