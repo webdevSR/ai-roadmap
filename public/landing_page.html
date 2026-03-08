@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tools Bible — Automation Villa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050508;
+    --surface: #0e0e16;
+    --card: #13131e;
+    --border: rgba(255,255,255,0.07);
+    --purple: #8B5CF6;
+    --purple-dim: rgba(139,92,246,0.15);
+    --cyan: #22d3ee;
+    --gold: #f59e0b;
+    --white: #f0f0f8;
+    --gray: #6b7280;
+    --green: #10b981;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── Glow blobs ── */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.25;
+  }
+  .blob-1 { width: 600px; height: 600px; background: var(--purple); top: -200px; left: -100px; animation: drift 12s ease-in-out infinite alternate; }
+  .blob-2 { width: 400px; height: 400px; background: var(--cyan); bottom: 20%; right: -100px; animation: drift 16s ease-in-out infinite alternate-reverse; }
+  .blob-3 { width: 300px; height: 300px; background: var(--gold); top: 50%; left: 40%; animation: drift 10s ease-in-out infinite alternate; opacity: 0.1; }
+
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(40px, 30px) scale(1.05); }
+  }
+
+  /* ── Layout ── */
+  section, nav, footer { position: relative; z-index: 1; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Urgency Bar ── */
+  .urgency-bar {
+    background: linear-gradient(90deg, #7c3aed, #6d28d9);
+    padding: 10px 24px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: white;
+    position: relative;
+    z-index: 101;
+    letter-spacing: 0.01em;
+  }
+  .urgency-bar .timer-inline {
+    display: inline-flex; gap: 6px; align-items: center;
+    background: rgba(0,0,0,0.25);
+    border-radius: 6px;
+    padding: 2px 10px;
+    margin-left: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+  .urgency-bar .fire { animation: shake 1.2s infinite; display: inline-block; }
+  @keyframes shake {
+    0%,100% { transform: rotate(-8deg); }
+    50%      { transform: rotate(8deg); }
+  }
+
+  /* ── Buyers popup ── */
+  .buyer-toast {
+    position: fixed;
+    bottom: 24px; left: 24px;
+    background: var(--card);
+    border: 1px solid rgba(16,185,129,0.4);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    z-index: 999;
+    font-size: 0.82rem;
+    max-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateX(-120%);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .buyer-toast.show { transform: translateX(0); }
+  .buyer-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .buyer-text { line-height: 1.4; }
+  .buyer-text strong { color: var(--white); display: block; font-size: 0.85rem; }
+  .buyer-text span { color: var(--gray); font-size: 0.75rem; }
+
+  /* ── Countdown section ── */
+  .countdown-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 0;
+  }
+  .countdown-inner {
+    display: flex; align-items: center; justify-content: center;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .countdown-label {
+    font-size: 0.9rem; color: var(--gray);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .countdown-label .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse-dot 1.5s infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(1.4); }
+  }
+  .countdown-blocks {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .cd-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 64px;
+  }
+  .cd-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--purple);
+    line-height: 1;
+    display: block;
+  }
+  .cd-label {
+    font-size: 0.65rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+    display: block;
+  }
+  .cd-sep {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--purple);
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* ── Buyers counter ── */
+  .buyers-strip {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin: 32px auto 0;
+    max-width: 420px;
+    font-size: 0.9rem;
+  }
+  .buyers-strip .avatars { display: flex; }
+  .buyers-strip .avatars span {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--bg);
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    margin-left: -8px;
+  }
+  .buyers-strip .avatars span:first-child { margin-left: 0; }
+  .buyers-count { font-weight: 600; color: var(--green); }
+
+  /* ── Nav ── */
+  nav {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,5,8,0.8);
+  }
+  nav .inner {
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1100px; margin: 0 auto; padding: 0 24px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+  .logo span { color: var(--purple); }
+  .nav-cta {
+    background: var(--purple);
+    color: white;
+    border: none;
+    padding: 9px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { background: #7c3aed; transform: translateY(-1px); }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 110px 0 80px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--purple-dim);
+    border: 1px solid rgba(139,92,246,0.3);
+    color: #a78bfa;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .eyebrow::before { content: '✦'; font-size: 0.7rem; }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: #9ca3af;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-cta-group {
+    display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--purple);
+    color: white;
+    text-decoration: none;
+    padding: 16px 36px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.25s;
+    box-shadow: 0 0 40px rgba(139,92,246,0.4);
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 0 60px rgba(139,92,246,0.5);
+  }
+  .btn-primary .arrow { transition: transform 0.2s; }
+  .btn-primary:hover .arrow { transform: translateX(4px); }
+
+  .price-tag {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--white);
+  }
+  .price-tag .og {
+    font-size: 0.85rem;
+    color: var(--gray);
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-right: 6px;
+  }
+  .price-tag .badge {
+    background: rgba(16,185,129,0.15);
+    color: var(--green);
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+
+  /* ── Stats strip ── */
+  .stats-strip {
+    display: flex; justify-content: center; gap: 0;
+    margin-top: 72px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stat {
+    flex: 1;
+    padding: 24px 20px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    background: var(--card);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--purple);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── What's inside ── */
+  .section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--purple);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    color: var(--gray);
+    font-size: 1rem;
+    max-width: 500px;
+  }
+
+  .inside-section { padding: 100px 0; }
+  .inside-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 56px;
+  }
+  .inside-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .inside-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, var(--purple)), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .inside-card:hover { transform: translateY(-4px); border-color: rgba(139,92,246,0.3); }
+  .inside-card:hover::before { opacity: 1; }
+  .card-emoji { font-size: 2rem; margin-bottom: 14px; display: block; }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .card-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; margin-bottom: 16px; }
+  .card-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tool-chip {
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    color: #9ca3af;
+  }
+
+  /* ── Prompts preview ── */
+  .prompts-section { padding: 80px 0; background: var(--surface); }
+  .prompts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 48px;
+  }
+  .prompt-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0;
+    padding: 20px;
+    transition: transform 0.2s;
+  }
+  .prompt-card:hover { transform: translateX(4px); }
+  .prompt-num {
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .prompt-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  .prompt-preview { font-size: 0.8rem; color: var(--gray); line-height: 1.5; }
+
+  /* ── Social Proof ── */
+  .proof-section { padding: 80px 0; }
+  .proof-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 48px; }
+  .proof-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .stars { color: var(--gold); font-size: 1rem; margin-bottom: 14px; letter-spacing: 2px; }
+  .proof-text { font-size: 0.9rem; color: #d1d5db; line-height: 1.7; margin-bottom: 18px; font-style: italic; }
+  .proof-author { font-size: 0.8rem; color: var(--gray); }
+  .proof-author strong { color: var(--white); font-style: normal; display: block; }
+
+  /* ── CTA Section ── */
+  .cta-section {
+    padding: 100px 0;
+    text-align: center;
+  }
+  .cta-box {
+    background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(34,211,238,0.08) 100%);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 24px;
+    padding: 72px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at center, rgba(139,92,246,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cta-box h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .cta-box p { color: var(--gray); font-size: 1rem; margin-bottom: 40px; }
+  .guarantee {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 20px;
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+  .guarantee::before { content: '🔒'; }
+
+  /* ── Footer ── */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  footer a { color: var(--purple); text-decoration: none; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Mobile ── */
+  @media (max-width: 640px) {
+    .stats-strip { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    .proof-grid { grid-template-columns: 1fr; }
+    .cta-box { padding: 48px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Buyer Toast -->
+<div class="buyer-toast" id="buyerToast">
+  <div class="buyer-avatar" id="toastEmoji">😊</div>
+  <div class="buyer-text">
+    <strong id="toastName">Rahul from Mumbai</strong>
+    <span id="toastTime">just purchased this guide</span>
+  </div>
+</div>
+
+<!-- Urgency Bar -->
+<div class="urgency-bar">
+  <span class="fire">🔥</span>
+  <strong>Launch Offer:</strong> 80% OFF ends in
+  <span class="timer-inline" id="topTimer">00:00:00</span>
+  &nbsp;·&nbsp; Only <strong id="spotsLeft">17</strong> copies left at this price
+</div>
+
+<!-- Nav -->
+<nav>
+  <div class="inner">
+    <div class="logo">Automation<span>Villa</span></div>
+    <a href="#buy" class="nav-cta">Get It — ₹199</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">For Content Creators & Freelancers</div>
+    <h1>
+      The Only AI Toolkit
+      <span class="line2">You'll Ever Need</span>
+    </h1>
+    <p class="hero-sub">
+      50+ handpicked AI tools across 7 categories + 6 ready-to-use prompts. 
+      Save 10+ hours every week. No fluff, no $1000 course needed.
+    </p>
+    <div class="hero-cta-group">
+      <a href="#buy" class="btn-primary">
+        Get Instant Access <span class="arrow">→</span>
+      </a>
+      <div class="price-tag">
+        <span class="og">₹999</span>₹199
+        <span class="badge">80% OFF</span>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">AI Tools</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Power Prompts</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">10hr+</div>
+        <div class="stat-label">Saved Weekly</div>
+      </div>
+    </div>
+
+    <!-- Buyers count -->
+    <div class="buyers-strip reveal">
+      <div class="avatars">
+        <span>🧑</span><span>👩</span><span>👨</span><span>🧑</span><span>👩</span>
+      </div>
+      <span><span class="buyers-count" id="buyerCount">143</span> people have already grabbed this</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- Countdown -->
+<section class="countdown-section">
+  <div class="container">
+    <div class="countdown-inner">
+      <div class="countdown-label">
+        <span class="dot"></span>
+        Launch price of ₹199 expires in
+      </div>
+      <div class="countdown-blocks">
+        <div class="cd-block"><span class="cd-num" id="cdH">00</span><span class="cd-label">Hours</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-block"><span class="cd-num" id="cdM">00</span><span class="cd-label">Mins</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-block"><span class="cd-num" id="cdS">00</span><span class="cd-label">Secs</span></div>
+      </div>
+      <a href="#buy" class="btn-primary" style="padding: 12px 28px; font-size: 0.9rem;">Lock My Price →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- What's Inside -->
+<section class="inside-section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">What's Inside</div>
+      <h2 class="section-title">Everything. Organized.<br>Ready to use.</h2>
+      <p class="section-sub">Each section gives you the best tools for that job — with cost, website, and exactly what it's best for.</p>
+    </div>
+
+    <div class="inside-grid">
+      <div class="inside-card reveal" style="--accent-color: #8B5CF6">
+        <span class="card-emoji">🎬</span>
+        <div class="card-title">Video Creation</div>
+        <div class="card-desc">Make cinematic brand videos that don't look AI-generated.</div>
+        <div class="card-tools">
+          <span class="tool-chip">Runway</span>
+          <span class="tool-chip">Kling AI</span>
+          <span class="tool-chip">Pika</span>
+          <span class="tool-chip">Higgsfield</span>
+          <span class="tool-chip">Luma</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #22d3ee">
+        <span class="card-emoji">🎨</span>
+        <div class="card-title">Image & Design</div>
+        <div class="card-desc">Generate product shots & lifestyle visuals in seconds.</div>
+        <div class="card-tools">
+          <span class="tool-chip">Midjourney</span>
+          <span class="tool-chip">Leonardo</span>
+          <span class="tool-chip">Firefly</span>
+          <span class="tool-chip">Ideogram</span>
+          <span class="tool-chip">Canva AI</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #10b981">
+        <span class="card-emoji">✍️</span>
+        <div class="card-title">Writing & Copy</div>
+        <div class="card-desc">Write ads, captions & emails 10x faster with AI.</div>
+        <div class="card-tools">
+          <span class="tool-chip">Claude</span>
+          <span class="tool-chip">ChatGPT</span>
+          <span class="tool-chip">Copy.ai</span>
+          <span class="tool-chip">Jasper</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #f59e0b">
+        <span class="card-emoji">🎵</span>
+        <div class="card-title">Audio & Voice</div>
+        <div class="card-desc">Clone voices, generate music & voiceovers instantly.</div>
+        <div class="card-tools">
+          <span class="tool-chip">ElevenLabs</span>
+          <span class="tool-chip">Suno</span>
+          <span class="tool-chip">Murf</span>
+          <span class="tool-chip">Udio</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #ec4899">
+        <span class="card-emoji">📱</span>
+        <div class="card-title">Social Media</div>
+        <div class="card-desc">Schedule, analyze & grow your accounts on autopilot.</div>
+        <div class="card-tools">
+          <span class="tool-chip">Buffer AI</span>
+          <span class="tool-chip">Metricool</span>
+          <span class="tool-chip">Publer</span>
+          <span class="tool-chip">FeedHive</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #ef4444">
+        <span class="card-emoji">📣</span>
+        <div class="card-title">Ad Creation</div>
+        <div class="card-desc">Create high-converting ads without hiring a designer.</div>
+        <div class="card-tools">
+          <span class="tool-chip">AdCreative</span>
+          <span class="tool-chip">Pencil</span>
+          <span class="tool-chip">Canva Magic</span>
+        </div>
+      </div>
+      <div class="inside-card reveal" style="--accent-color: #8B5CF6">
+        <span class="card-emoji">⚡</span>
+        <div class="card-title">Productivity</div>
+        <div class="card-desc">Automate boring tasks & reclaim hours every week.</div>
+        <div class="card-tools">
+          <span class="tool-chip">Notion AI</span>
+          <span class="tool-chip">Make.com</span>
+          <span class="tool-chip">Zapier</span>
+          <span class="tool-chip">Otter.ai</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Prompts -->
+<section class="prompts-section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Bonus Included</div>
+      <h2 class="section-title">6 Power Prompts</h2>
+      <p class="section-sub">Copy → fill the brackets → paste into Claude or ChatGPT. Instant results.</p>
+    </div>
+    <div class="prompts-grid">
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 01</div>
+        <div class="prompt-title">Instagram Reel Hook</div>
+        <div class="prompt-preview">5 scroll-stopping opening lines that create instant curiosity...</div>
+      </div>
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 02</div>
+        <div class="prompt-title">Product Description</div>
+        <div class="prompt-preview">Emotional, benefit-driven copy that sells the transformation...</div>
+      </div>
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 03</div>
+        <div class="prompt-title">Facebook/Instagram Ad</div>
+        <div class="prompt-preview">Hook + bullets + social proof + CTA under 150 words...</div>
+      </div>
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 04</div>
+        <div class="prompt-title">Cold DM to Brand</div>
+        <div class="prompt-preview">5-line DM that gets replies without being salesy...</div>
+      </div>
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 05</div>
+        <div class="prompt-title">Email Subject Lines</div>
+        <div class="prompt-preview">10 subject lines mixing curiosity, urgency & benefits...</div>
+      </div>
+      <div class="prompt-card reveal">
+        <div class="prompt-num">Prompt 06</div>
+        <div class="prompt-title">Content Calendar</div>
+        <div class="prompt-preview">7-day Instagram plan with hooks, captions & hashtags...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social proof -->
+<section class="proof-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom: 0">
+      <div class="section-label">What People Say</div>
+      <h2 class="section-title">Built for creators who<br>actually want results</h2>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="proof-text">"I used to spend 2 hours just figuring out which AI tool to use. This guide cut that down to 5 minutes. Worth every rupee."</p>
+        <div class="proof-author"><strong>Priya M.</strong>Freelance Content Creator, Mumbai</div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="proof-text">"The Cold DM prompt alone got me 3 brand replies in a week. I've been struggling with outreach for months. This changed everything."</p>
+        <div class="proof-author"><strong>Arjun S.</strong>Digital Marketer, Bangalore</div>
+      </div>
+      <div class="proof-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="proof-text">"Honestly thought this would be another generic list. But the 'Best For' column for each tool is genuinely useful. Saved me from wasting money on wrong tools."</p>
+        <div class="proof-author"><strong>Sneha R.</strong>Small Business Owner, Delhi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="buy">
+  <div class="container">
+    <div class="cta-box reveal">
+      <h2>Stop Googling.<br>Start Creating.</h2>
+      <p>One PDF. 50+ tools. Everything you need to work smarter with AI — starting today.</p>
+      <a href="YOUR_RAZORPAY_LINK_HERE" class="btn-primary" style="font-size:1.1rem; padding: 18px 48px;">
+        Get Instant Access — ₹199 <span class="arrow">→</span>
+      </a>
+      <div class="guarantee">Instant download after payment. No subscription. Yours forever.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>© 2025 <a href="#">Automation Villa</a> · <a href="https://rishi.social">rishi.social</a></p>
+    <p style="margin-top: 8px; font-size: 0.75rem;">Questions? DM us on Instagram @automationvilla</p>
+  </div>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── Countdown Timer (resets to 23:59:59 each visit — stored in sessionStorage) ──
+  function getDeadline() {
+    let deadline = sessionStorage.getItem('avDeadline');
+    if (!deadline) {
+      deadline = Date.now() + 23 * 60 * 60 * 1000 + 59 * 60 * 1000 + 59 * 1000;
+      sessionStorage.setItem('avDeadline', deadline);
+    }
+    return parseInt(deadline);
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateTimer() {
+    const diff = getDeadline() - Date.now();
+    if (diff <= 0) {
+      ['cdH','cdM','cdS'].forEach(id => document.getElementById(id).textContent = '00');
+      document.getElementById('topTimer').textContent = '00:00:00';
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cdH').textContent = pad(h);
+    document.getElementById('cdM').textContent = pad(m);
+    document.getElementById('cdS').textContent = pad(s);
+    document.getElementById('topTimer').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+  updateTimer();
+  setInterval(updateTimer, 1000);
+
+  // ── Spots left — slowly decrements ──
+  let spots = parseInt(sessionStorage.getItem('avSpots') || '17');
+  document.getElementById('spotsLeft').textContent = spots;
+  setInterval(() => {
+    if (spots > 7 && Math.random() < 0.15) {
+      spots--;
+      sessionStorage.setItem('avSpots', spots);
+      document.getElementById('spotsLeft').textContent = spots;
+    }
+  }, 45000);
+
+  // ── Buyer count — slowly increments ──
+  let buyers = parseInt(sessionStorage.getItem('avBuyers') || '143');
+  document.getElementById('buyerCount').textContent = buyers;
+  setInterval(() => {
+    if (Math.random() < 0.2) {
+      buyers++;
+      sessionStorage.setItem('avBuyers', buyers);
+      document.getElementById('buyerCount').textContent = buyers;
+    }
+  }, 30000);
+
+  // ── Buyer toasts ──
+  const buyerNames = [
+    { name: "Rahul from Mumbai", emoji: "👨" },
+    { name: "Priya from Delhi", emoji: "👩" },
+    { name: "Arjun from Bangalore", emoji: "🧑" },
+    { name: "Sneha from Pune", emoji: "👩" },
+    { name: "Rohan from Hyderabad", emoji: "👨" },
+    { name: "Divya from Chennai", emoji: "👩" },
+    { name: "Karan from Ahmedabad", emoji: "🧑" },
+    { name: "Pooja from Kolkata", emoji: "👩" },
+    { name: "Nikhil from Jaipur", emoji: "👨" },
+    { name: "Ananya from Surat", emoji: "👩" },
+  ];
+  const timeAgo = ["just now", "2 mins ago", "5 mins ago", "8 mins ago", "12 mins ago"];
+
+  function showToast() {
+    const buyer = buyerNames[Math.floor(Math.random() * buyerNames.length)];
+    const time  = timeAgo[Math.floor(Math.random() * timeAgo.length)];
+    const toast = document.getElementById('buyerToast');
+    document.getElementById('toastEmoji').textContent = buyer.emoji;
+    document.getElementById('toastName').textContent = buyer.name;
+    document.getElementById('toastTime').textContent = `purchased this guide · ${time}`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // First toast after 4s, then random every 18-35s
+  setTimeout(() => {
+    showToast();
+    setInterval(showToast, 18000 + Math.random() * 17000);
+  }, 4000);
+</script>
+</body>
+</html>
